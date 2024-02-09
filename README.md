@@ -1,7 +1,7 @@
+<em>Note: project in progress.</em>
+
 <h4>Intro</h4>
 A Raspberry Pi-based greenhouse project.
-
-<em>Note: project in progress.</em>
 
 <h4>Hardware list:</h4>
 - DHT11 - temperature and humidity sensor
