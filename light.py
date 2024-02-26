@@ -6,29 +6,45 @@ import digitalio
 LIGHT_SENSOR = board.D26
 LED = board.D16
 
-def local_setup():
-	light = digitalio.DigitalInOut(LIGHT_SENSOR)
-	
-	led = digitalio.DigitalInOut(LED)
-	led.direction = digitalio.Direction.OUTPUT
-	
-	return led, light
-	
-def light_setup(is_dark, led):
-	"""
-	This function sets the lighting depending on the photoresistor state.
-	"""
-	# Light sensor will return 1 if it is dark outside
+class LightSensor:
 
-	if(is_dark):
-		led.value = True
-	else:
-		led.value = False
-	return led
+	def __init__(self, sensor_pin):
+		
+		self.sensor_pin = sensor
+		self.light = digitalio.DigitalInOut(self.sensor_pin)
+		
+		self.led_pin
+		self.led = digitalio.DigitalInOut(self.led_pin)
+		self.led.direction = digitalio.Direction.OUTPUT
+		
+	def read_value(self):
+		
+		# Light sensor will return 1 if it is dark outside
+		return self.light.value
+
+
+class GreenhouseLed():
+
+	def __init__(self, led_pin):
+				
+		self.led_pin
+		self.led = digitalio.DigitalInOut(self.led_pin)
+		self.led.direction = digitalio.Direction.OUTPUT
+
+	def light_setup(self, sensor_status):
+
+		if(sensor_status):
+			self.led.value = True
+		else:
+			self.led.value = False
+
 
 if __name__ == "__main__":
-	led, light = local_setup()
-	
-	while(True):
-		led = light_setup(light.value, led)
+
+	light_sensor = LightSensor(LED)
+	greenhouse_led = GreenhouseLed(LIGHT_SENSOR)	
+
+	while True: 
+		status = light_sensor.read_value()
+		greenhouse_light.light_setup(status)
 		time.sleep(1)
