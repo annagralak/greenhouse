@@ -3,46 +3,35 @@ import board
 import digitalio
 import adafruit_dht
 from datetime import datetime
-from light import light_setup
-from temp_and_humidity import measure_temp_and_humidity
+from light import LightSensor, GreenhouseLed
+# from temp_and_humidity import measure_temp_and_humidity
 
 # Time interval between next measurements in seconds
 TIME_INTERVAL = 2
 
 # GPIO pins 
-LIGHT_SENSOR = board.D26
-LED = board.D16
-TEMP = board.D4
+LIGHT_SENSOR_PIN = board.D26
+LED_PIN = board.D16
+TH_SENSOR_PIN = board.D4
 
-def setup():
-	"""
- 	This function will initialize all the settings such as GPIO pins
-	""" 
-	# Light
-	light = digitalio.DigitalInOut(LIGHT_SENSOR)
-	led = digitalio.DigitalInOut(LED)
-	led.direction = digitalio.Direction.OUTPUT
 
-	# Temperature and humidity
-	sensor = adafruit_dht.DHT11(TEMP)
-	return led, light, sensor
+if __name__ == "__main__":
 
-def main():
-	led, light, sensor = setup()
+	light_sensor = LightSensor(LED_PIN)
+	greenhouse_led = GreenhouseLed(LIGHT_SENSOR_PIN)	
 
-	while True:
-		led = light_setup(light.value, led)
-		temp, humidity = measure_temp_and_humidity(sensor)
-		# now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+	# temp and humidity sensor
+	th_sensor = adafruit_dht.DHT11(TEMP)
+
+	while True: 
 		now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 		print("--------------------------")
 		print(f"Time: {now}")
-		print(f"Temperature: {temp}ºC")
-		print(f"Humidity: {humidity}%")
-		print(f"Light status: {led.value}")
 
-		time.sleep(TIME_INTERVAL)
+		print(f"Temperature: {sensor.temperature}ºC")
+		print(f"Humidity: {sensor.humidity}%")
 
-if __name__ == "__main__":
-	main()
+		greenhouse_light.light_setup(light_sensor.read_value())
+
+		time.sleep(1)
