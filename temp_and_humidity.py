@@ -9,41 +9,36 @@ TIME_INTERVAL = 10
 # Th)e data pin is connected to GPIO 4
 TEMP_PIN = board.D4
 
-# class TempHumiditySensor(adafruit_dht.DHT11)
-# 	"""
-# 	A class used for DHT11 temperature and humidity sensor
-# 	"""
+class THSensor(adafruit_dht.DHT11)
+	"""
+	A class used for DHT11 temperature and humidity sensor
 
-# 	def __init__():
-# 		pass
+	Methods
+    -------
+    measure_temp_and_humidity()
+        Returns self.temperature and self.humidity
+	"""
 
-# 	#def local_setup():
-# 		# Sensor type is DHT11
-# 		#sensor = adafruit_dht.DHT11(TEMP)
-# 		#return sensor
-
-# 	def measure_temp_and_humidity(sensor): 
-# 		try:
-# 			temperature = sensor.temperature
-# 			humidity = sensor.humidity
-# 			return temperature, humidity
+	def measure_temp_and_humidity(): 
+		try:
+			return self.temperature, self.humidity
 		 
-# 		except RuntimeError as error:
-# 			print(f"RuntimeError: {error.args[0]}")
-# 			time.sleep(2.0)
-# 			# RuntimeError is expected from time to time, so just
-# 			# recursively try again
-# 			temperature, humidity = measure_temp_and_humidity(sensor)
-# 			return temperature, humidity
+		except RuntimeError as error:
+			print(f"RuntimeError: {error.args[0]}")
+			time.sleep(2.0)
+			# RuntimeError is expected from time to time, so just
+			# recursively try again
+			temperature, humidity = self.measure_temp_and_humidity()
+			return temperature, humidity
 	        
-# 		except Exception as error:
-# 			# Stop when it is a new problem
-# 			sensor.exit()
-# 			raise error
+		except Exception as error:
+			# Stop when it is a new problem
+			self.exit()
+			raise error
     
 if __name__ == "__main__":
 
-	sensor = adafruit_dht.DHT11(TEMP_PIN)
+	sensor = THSensor(TEMP_PIN)
 
 	while True:		
 		print(f"Temperature: {sensor.temperature}ºC, "
