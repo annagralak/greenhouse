@@ -3,14 +3,8 @@ import board
 import digitalio
 
 # GPIO pin setup 
-LIGHT_SENSOR_PIN = 26
-LED_PIN = 16
-
-# to do it better later
-PIN_MAPPING = {
-	16: board.D16,
-	26 : board.D26
-	}
+LIGHT_SENSOR_PIN = board.D26
+LED_PIN = board.D16
 
 class LightSensor:
 	"""
@@ -32,16 +26,12 @@ class LightSensor:
     read_value()
         Returns the status of the light sensor
 
-    Raises
-    -------
-    TODO
-
 	"""
 
 	def __init__(self, sensor_pin):
 	
 		self.sensor_pin = sensor_pin
-		self.light_sensor = digitalio.DigitalInOut(PIN_MAPPING[self.sensor_pin])
+		self.light_sensor = digitalio.DigitalInOut(self.sensor_pin)
 
 		
 	def read_value(self):
@@ -49,7 +39,7 @@ class LightSensor:
 		return self.light_sensor.value
 
 
-class GreenhouseLed():
+class GreenhouseLed:
 	"""
 	A class used for controling the LED light in the greenhouse
 
@@ -65,10 +55,6 @@ class GreenhouseLed():
     light_setup(sensor_status)
         Will turn on or off the lighting basing on light sensor status
 
-    Raises
-    -------
-    TODO
-    
 	"""
 
 	def __init__(self, led_pin):
@@ -81,8 +67,11 @@ class GreenhouseLed():
 
 		if(sensor_status):
 			self.led.value = True
+			print("Light status: ON")
+			
 		else:
 			self.led.value = False
+			print("Light status: OFF")
 
 
 if __name__ == "__main__":
