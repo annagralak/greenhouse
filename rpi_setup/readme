@@ -1,0 +1,31 @@
+1. Set eth connection
+
+On Mac:
+    System Settings > Network > Ethernet
+    DHCP> Manually
+    IP: 192.168.2.1
+    Subnet Mask: 255.255.255.0
+
+On RPi:
+    sudo nmcli con add type ethernet ifname eth0 con-name static-eth0 ipv4.addresses 192.168.2.2/24 ipv4.method manual
+    sudo nmcli c up static-eth0
+
+2. Set AP on RPi:
+    nmcli connection add type wifi ifname wlan0 con-name esp32-ap autoconnect yes ssid ESP32_AP
+    nmcli connection modify esp32-ap 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared
+    nmcli connection modify esp32-ap wifi-sec.key-mgmt wpa-psk wifi-sec.psk "supersecretpassword"
+    nmcli connection up esp32-ap
+
+    nmcli connection modify esp32-ap \
+  802-11-wireless-security.key-mgmt wpa-psk \
+  802-11-wireless-security.proto rsn \
+  802-11-wireless-security.pairwise ccmp
+
+    nmcli connection down esp32-ap
+    nmcli connection up esp32-ap
+
+    Check AP ip:
+        ip a show wlan0
+
+    Set stable IP:
+	    sudo nmcli connection modify RPi_AP ipv4.method shared ipv4.addresses 192.168.4.1/24
