@@ -78,7 +78,6 @@ def main():
         print(f"Published: {payload}")        
         time.sleep(600)
 
-# run main automatically
 if __name__ == "__main__":
     main()
 
