@@ -10,20 +10,13 @@ from sensors.ds18b20 import DS18B20Sensor
 from sensors.hw103 import HW103Sensor
 from sensors.capacitive_moisture import CapacitiveMoistureSensor
 
-# Wi-Fi credentials
-SSID = "RPi_AP"
-PASSWORD = "raspberry420"
-
-#SSID = "40264196"
-#PASSWORD = "TP-LINK_F05C"
-
 MQTT_BROKER = "192.168.4.1"
 MQTT_PORT = 1883
 MQTT_TOPIC = "greenhouse/esp32-1/sensors"
 
 def main():
     # Connect to Wi-Fi
-    wifi = WiFiManager(SSID, PASSWORD)
+    wifi = WiFiManager()
     wifi.connect()
 
     # Setup SensorManager

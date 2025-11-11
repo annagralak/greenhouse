@@ -1,4 +1,5 @@
-__pycache__/*
-/venv/*
 /data/*
+/venv/*
+__pycache__/*
+esp_setup/wifi_credentials.json
 TODO

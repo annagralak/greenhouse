@@ -1,12 +1,44 @@
+import json
 import network
 import time
+import os
 
 class WiFiManager:
-    def __init__(self, ssid: str, password: str):
-        self.ssid = ssid
-        self.password = password
+    def __init__(self):
         self.wlan = network.WLAN(network.STA_IF)
         self.wlan.active(True)
+        
+        self._load_credentials()  
+  
+    def _load_credentials(self):
+        """
+        Loads Wi-Fi credentials from a JSON file.
+        Expected format:
+        {
+            "ssid": "network_name",
+            "password": "password"
+        }
+        """ 
+        credentials_path = "wifi_credentials.json"
+
+        try:
+            os.stat(credentials_path)
+        except OSError:
+            raise FileNotFoundError(
+                f"Credentials file not found: {self.credentials_path}")
+
+        try:
+            with open(credentials_path, "r") as f:
+                data = json.load(f)
+
+            self.ssid = data.get("ssid")
+            self.password = data.get("password")
+
+            print(f"Loaded Wi-Fi credentials for SSID: {self.ssid}")
+            print(f"Password: {self.password}")
+
+        except Exception as e:
+            raise ValueError(e)            
 
     def connect(self, timeout: int = 10) -> str:
         """Try to connect to Wi-Fi. Returns IP address or raises RuntimeError."""
