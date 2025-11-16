@@ -41,27 +41,27 @@ def main():
     except Exception as e:
         print(f"Sensor not added: {e}")
 
+
 # To be uncommented when tested better
 #   
-#    try:
-#        hw103 = HW103Sensor(name="HW-103", pin=35)
-#        manager.add_sensor(hw103)
-#    except Exception as e:
-#        print(f"Sensor not added: {e}")
-#
-#    try:
-#        cap_moisture = CapacitiveMoistureSensor(name="Capacitive moisture", pin=34)
-#        manager.add_sensor(cap_moisture)
-#    except Exception as e:
-#        print(f"Sensor not added: {e}")
-#
+    try:
+        hw103 = HW103Sensor(name="HW-103", pin=35)
+        manager.add_sensor(hw103)
+    except Exception as e:
+        print(f"Sensor not added: {e}")
+
+    try:
+        cap_moisture = CapacitiveMoistureSensor(name="Capacitive moisture", pin=34)
+        manager.add_sensor(cap_moisture)
+    except Exception as e:
+        print(f"Sensor not added: {e}")
+
 
     mqtt_client = MQTTClient("esp32_client", MQTT_BROKER, port = MQTT_PORT)
     mqtt_client.connect()    
 
     print("Setup complete. Starting loop...")
 
-    # Main loop: read every 10 seconds
     while True:
         wifi.ensure_connected()  # keep Wi-Fi alive
         measurements = manager.read_all()
@@ -69,7 +69,8 @@ def main():
         mqtt_client.publish(MQTT_TOPIC, payload)
          
         print(f"Published: {payload}")        
-        time.sleep(600)
+        #time.sleep(600)
+        time.sleep(60)
 
 if __name__ == "__main__":
     main()
