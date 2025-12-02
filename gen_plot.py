@@ -1,6 +1,7 @@
 import argparse
 import json
 import matplotlib.pyplot as plt
+import os
 import pandas as pd
 
 from datetime import datetime
@@ -43,7 +44,7 @@ def gen_plot(df, keyword):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-    plt.savefig(keyword + ".png")
+    plt.savefig(os.path.join("plots", keyword + ".png"))
 
 if __name__ == "__main__":
 
@@ -52,6 +53,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--temperature", action="store_true", help="Plot temperature")
     parser.add_argument("-hu", "--humidity", action="store_true", help="Plot humidity")
     parser.add_argument("-p", "--pressure", action="store_true", help="Plot pressure")
+    parser.add_argument("-m", "--moisture", action="store_true", help="Plot moisture")
     args = parser.parse_args()
 
     df = pd.read_csv(args.filename)    
@@ -59,13 +61,15 @@ if __name__ == "__main__":
 
     if args.temperature:
         gen_plot(df, "temperature")
-    elif args.humidity:
+    if args.humidity:
         gen_plot(df, "humidity")
-    elif args.pressure:
+    if args.pressure:
         gen_plot(df, "pressure")
+    if args.moisture:
+        gen_plot(df, "moisture")    
 
-    else:
-        print("ERROR: No valid measurement chosen")
+    #else:
+    #   print("ERROR: No valid measurement chosen")
         exit()
 
     
