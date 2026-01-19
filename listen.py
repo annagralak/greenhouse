@@ -1,12 +1,21 @@
 import os
 import csv
 import json
+import time
 import paho.mqtt.client as mqtt
 
 from datetime import datetime
 
 BROKER = "localhost"
 TOPIC = "greenhouse/esp32-1/sensors"
+
+def update_timestamp(data):
+    """Replace all 'timestamp' values exposed by ESP32 by the current time from RPi system."""
+    now_str = time.strftime("%Y-%m-%d %H:%M", time.localtime())
+    for sensor in data.values():
+        if 'timestamp' in sensor:
+            sensor['timestamp'] = now_str
+    return data
 
 def pretty_print(data, indent=0):
     """Recursively print JSON"""
@@ -36,6 +45,9 @@ def on_message(client, userdata, msg):
     try:
         payload = msg.payload.decode("utf-8")
         data = json.loads(payload)
+        
+        # This line should be commented out if timestamp from ESP32 should be used      
+        data = update_timestamp(data)
 
         print("\n--- Sensor Update ---")
         pretty_print(data)
