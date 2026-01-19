@@ -1,6 +1,7 @@
-import os
+import argparse
 import csv
 import json
+import os
 import time
 import paho.mqtt.client as mqtt
 
@@ -74,8 +75,11 @@ def create_new_file():
     return filename 
     
 if __name__ == "__main__":
-    
-    filename = create_new_file()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-o", "--output", help="Optional filename for CSV output")
+    args = parser.parse_args() 
+
+    filename = args.output if args.output else create_new_file()
 
     client = mqtt.Client(userdata={"filename": filename})
     client.on_connect = on_connect
