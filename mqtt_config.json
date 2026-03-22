@@ -1,8 +1,14 @@
 {
   "mqtt_broker": "localhost",
   "mqtt_port": 1883,
+<<<<<<< HEAD
   "topic_list":[
     "greenhouse/esp32-1",
     "greenhouse/esp32_zero-2"
   ]
+=======
+  "topic_list":{
+    "greenhouse/esp32-1"
+  }
+>>>>>>> 5f4f56a (Sensors configuration moved to config files)
 }
