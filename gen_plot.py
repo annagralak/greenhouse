@@ -3,7 +3,6 @@ import json
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
-
 from datetime import datetime
 
 def parse_json_safe(s):
@@ -12,44 +11,63 @@ def parse_json_safe(s):
     except:
         return {}
 
-def gen_plot(df, keyword, output_file):
-    if df.empty:
+def load_data(filename, topic_filter=None):
+    data_list = []
+
+    with open(filename, "r", encoding="utf-8") as f:
+        for line in f:
+            entry = parse_json_safe(line)
+            if not entry:
+                continue
+
+            # Filter by topic if requested
+            if topic_filter and entry.get("topic") != topic_filter:
+                continue
+
+            data_list.append(entry)
+
+    if not data_list:
+        print("No data to plot")
+        return None
+
+    df = pd.DataFrame(data_list)
+    df['data_parsed'] = df['data']
+
+    # Flatten the 'data' column 
+    normalized = pd.json_normalize(df['data_parsed'])
+
+    return normalized
+
+def gen_plot(data, keyword, output_file):
+    if data.empty:
         print("Empty DataFrame")
         return
 
-    # Flatten the entire 'data_parsed' column at once
-    # This creates a DataFrame where each column is sensor_name.keyword or sensor_name.timestamp
-    normalized = pd.json_normalize(df['data_parsed'])
-
-    # Filter only columns that contain the keyword
-    value_cols = [col for col in normalized.columns if col.endswith(f".{keyword}")]
+    # Filter columns by keyword
+    value_cols = [col for col in data.columns if col.endswith(f".{keyword}")]
     if not value_cols:
         print(f"No measurements found for keyword '{keyword}'")
         return
-
-    # Extract timestamps vectorized
-    ts_cols = [col for col in normalized.columns if col.endswith(".timestamp")]
-    if not ts_cols:
-        print("No timestamps found")
-        return
-
-    # Melt DataFrame to long format
-    # value_cols contain the sensor readings
-    long_df = normalized.melt(value_vars=value_cols, var_name='sensor', value_name='value')
-
-    # Extract sensor name from column name
-    long_df['sensor'] = long_df['sensor'].str.replace(f".{keyword}", "", regex=False)
-
-    # Repeat timestamps for each sensor value
-    # For simplicity, take the first timestamp column (assuming all sensors in a row have same timestamp)
-    timestamps = pd.to_datetime(normalized[ts_cols[0]])
-    long_df['timestamp'] = pd.concat([timestamps]*len(value_cols), ignore_index=True)
-
-    # Plot using explicit figure
+  
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    for sensor, sensor_data in long_df.groupby("sensor"):
-        ax.plot(sensor_data["timestamp"], sensor_data["value"], label=sensor)
+    for col in value_cols:
+        sensor = col.replace(f".{keyword}", "")
+        ts_col = f"{sensor}.timestamp"
+
+        if ts_col not in data.columns:
+            continue
+
+        values = data[col]
+        timestamps = pd.to_datetime(data[ts_col], errors="coerce")
+
+        # Drop NaNs to avoid empty plots
+        mask = values.notna() & timestamps.notna()
+        values = values[mask]
+        timestamps = timestamps[mask]
+
+        if not values.empty:
+            ax.plot(timestamps, values, label=sensor)
 
     ax.set_xlabel("Time")
     ax.set_ylabel(keyword.capitalize())
@@ -59,11 +77,8 @@ def gen_plot(df, keyword, output_file):
     fig.tight_layout()
 
     # Save plot
-    plt_dir = "plots"
-    os.makedirs(plt_dir, exist_ok=True)
     plt.show()
     fig.savefig(output_file)
-
     plt.close(fig)
 
 if __name__ == "__main__":
@@ -75,18 +90,16 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--pressure", action="store_true", help="Plot pressure")
     parser.add_argument("-m", "--moisture", action="store_true", help="Plot moisture")
     parser.add_argument("-o", "--output", help="Optional output filename prefix for plots, otherwise will be saved under the same name as input file") 
+    parser.add_argument("--topic", help="Optional topic filter to plot only specific MQTT topic")
     args = parser.parse_args()
 
+    output_prefix = args.output if args.output else os.path.splitext(os.path.basename(args.filename))[0]
     plot_dir = "plots"
-    os.makedirs(plot_dir, exist_ok = True)    
+    os.makedirs(plot_dir, exist_ok=True)
 
-    if args.output:
-        output_prefix = args.output
-    else:
-        output_prefix = os.path.splitext(os.path.basename(args.filename))[0]
-
-    df = pd.read_csv(args.filename)    
-    df['data_parsed'] = df['data'].apply(parse_json_safe)
+    data = load_data(args.filename, args.topic)
+    if data is None:
+        exit(0)
 
     plots = {
         "temperature": args.temperature,
@@ -97,6 +110,6 @@ if __name__ == "__main__":
 
     for keyword, enabled in plots.items():
         if enabled:
-            gen_plot(df, keyword, os.path.join(plot_dir, f"{output_prefix}_{keyword}.png"))
+            gen_plot(data, keyword, os.path.join(plot_dir, f"{output_prefix}_{keyword}.png"))
 
     

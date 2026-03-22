@@ -1,0 +1,8 @@
+{
+  "mqtt_broker": "localhost",
+  "mqtt_port": 1883,
+  "topic_list":[
+    "greenhouse/esp32-1",
+    "greenhouse/esp32_zero-2"
+  ]
+}

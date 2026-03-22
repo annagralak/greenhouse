@@ -1,14 +1,19 @@
 import argparse
-import csv
 import json
 import os
 import time
 import paho.mqtt.client as mqtt
-
 from datetime import datetime
 
-BROKER = "localhost"
-TOPIC = "greenhouse/esp32-1/sensors"
+CONFIG_FILE = "mqtt_config.json"
+
+def load_config(path=CONFIG_FILE):
+    try:
+        with open(path, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Failed to load config {path}: {e}")
+        return None
 
 def update_timestamp(data):
     """Replace all 'timestamp' values exposed by ESP32 by the current time from RPi system."""
@@ -36,9 +41,11 @@ def pretty_print(data, indent=0):
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
-        print(f"Connected to MQTT broker at {BROKER}")
-        client.subscribe(TOPIC)
-        print(f"Subscribed to topic: {TOPIC}")
+        print(f"Connected to MQTT broker at {userdata['broker']}:{userdata['port']}")
+
+        for topic in userdata["topics"]:
+            client.subscribe(topic)
+            print(f"Subscribed to topic: {topic}")
     else:
         print(f"Connection failed with code {rc}")
 
@@ -50,43 +57,59 @@ def on_message(client, userdata, msg):
         # This line should be commented out if timestamp from ESP32 should be used      
         data = update_timestamp(data)
 
-        print("\n--- Sensor Update ---")
+        print(f"\n--- Sensor Update from {msg.topic} ---")
         pretty_print(data)
+
+        # Prepare JSON entry
+        entry = {
+            "topic": msg.topic,
+            "data": data,
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        }
+
+        fname = userdata["filename"]
+        os.makedirs(os.path.dirname(fname), exist_ok=True)
+
+        # Append one JSON object per line
+        with open(fname, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, separators=(',', ':'), ensure_ascii=False) + "\n")
 
     except Exception as e:
         print(f"Error parsing message: {e}")
         print("Raw payload:", msg.payload)
 
-    fname = userdata["filename"]
-        
-    with open(fname, "a", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow([msg.topic, json.dumps(data)])
-
 def create_new_file():
-    # Creating file for data, tbd better later
-    filename = os.path.join("data", datetime.now().strftime("data_%Y%m%d_%H%M%S.csv"))
-
-    # Create the CSV file and write header (optional)
-    with open(filename, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(["topic", "data"])
+    os.makedirs("data", exist_ok=True)
+    filename = os.path.join("data", datetime.now().strftime("data_%Y%m%d_%H%M%S.json"))
 
     return filename 
     
 if __name__ == "__main__":
+
+    config = load_config()
+    if not config:
+        exit(1)
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("-o", "--output", help="Optional filename for CSV output")
+    parser.add_argument("-o", "--output", help="Optional filename for output")
     args = parser.parse_args() 
 
     filename = args.output if args.output else create_new_file()
 
-    client = mqtt.Client(userdata={"filename": filename})
+    userdata = {
+        "filename": filename,
+        "broker": config["mqtt_broker"],
+        "port": config.get("mqtt_port", 1883),
+        "topics": config.get("topic_list", [])
+    }
+
+    client = mqtt.Client(userdata=userdata)
     client.on_connect = on_connect
     client.on_message = on_message
     
     print("Starting MQTT subscriber...")
-    client.connect(BROKER, 1883, 60)
+    client.connect(userdata["broker"], userdata["port"], 60)
     client.loop_forever()
     
     
+
