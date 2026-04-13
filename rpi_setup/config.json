@@ -1,0 +1,40 @@
+{
+  "mqtt_broker": "localhost",
+  "mqtt_port": 1883,
+  "topic_list": [
+    "greenhouse/esp32-1"
+  ],
+
+  "relays": [
+    {
+      "id": "heating_relay",
+      "type": "gpio",
+      "config": {
+        "pin": 17
+      }
+    },
+    {
+      "id": "lighting_relay",
+      "type": "gpio",
+      "config": {
+        "pin": 27
+      }
+    }
+  ],
+  "rules": [
+    {
+      "type": "temperature_control",
+      "sensor": "bme280_1",
+      "field": "temperature",
+      "relay": "heating_relay",
+      "on_below": 19,
+      "off_above": 21
+    },
+    {
+      "type": "time_control",
+      "relay": "lighting_relay",
+      "on_hour": 6.00, 
+      "off_hour": 18.00    
+    }
+  ]
+}
