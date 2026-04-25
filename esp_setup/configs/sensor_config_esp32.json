@@ -1,8 +1,8 @@
 {
   "id": "esp32-1",
+  "topic": "greenhouse/esp32-1",
   "mqtt_broker": "192.168.4.1",
   "mqtt_port": 1883,
-  "topic": "greenhouse/esp32-1",
   "loop_interval": 60,
 
   "sensors": [
