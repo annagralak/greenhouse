@@ -1,0 +1,33 @@
+{
+  "id": "esp32-1",
+  "topic": "greenhouse/esp32-1",
+  "mqtt_broker": "192.168.4.1",
+  "mqtt_port": 1883,
+  "loop_interval": 60,
+
+  "sensors": [
+    {
+      "id": "dht11_1",
+      "type": "dht11",
+      "config": {
+        "pin": 4
+      }
+    },
+    {
+      "id": "bme280_1",
+      "type": "bme280",
+      "config": {
+        "i2c_scl": 22,
+        "i2c_sda": 21
+      }
+    },
+    {
+      "id": "ds18b20_1",
+      "type": "ds18b20",
+      "config": {
+        "pin": 15
+      }
+    }
+  ]
+}
+  
