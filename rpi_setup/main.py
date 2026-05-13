@@ -1,5 +1,6 @@
 # import paho.mqtt.client as mqtt
 import argparse
+import time
 
 from logger import Logger
 from mqtt_client import MQTTClient
@@ -46,5 +47,25 @@ if __name__ == "__main__":
     
 	print("Starting MQTT subscriber...")
 	mqtt_client.connect()
-	mqtt_client.loop_forever()
+
+	try:
+	    while True:
+		    # process MQTT messages
+		    mqtt_client.loop()
+
+		    # evaluate time-based rules
+		    engine.evaluate_time_rules()
+
+		    time.sleep(1)
+
+	except KeyboardInterrupt:
+		print("Interrupted")
+
+	finally:
+	    print("Shutting down safely...")
+
+	    relay.cleanup()
+
+	    mqtt_client.disconnect() 
+	    
 

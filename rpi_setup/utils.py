@@ -61,7 +61,7 @@ def load_rules_from_config(config, state, relay):
                 )
             )
 
-            # IMPORTANT: OFF rule is implicit via inverted condition
+            # OFF rule is implicit via inverted condition
             engine_rules.append(
                 Rule(
                     condition=TimeCondition(off_hour, on_hour),

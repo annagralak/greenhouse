@@ -3,7 +3,6 @@ import paho.mqtt.client as mqtt
 
 from utils import pretty_print
 
-
 class MQTTClient:
 	"""MQTT handler connecting messages to state, logging, and rules."""
 
@@ -53,7 +52,7 @@ class MQTTClient:
 			60
 		)
 
-	def loop_forever(self):
-		"""Start blocking MQTT loop."""
-		
-		self.client.loop_forever()
+	def loop(self):
+		"""Process MQTT events without blocking."""
+		self.client.loop(timeout=1.0)
+
