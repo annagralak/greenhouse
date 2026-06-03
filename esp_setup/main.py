@@ -11,7 +11,7 @@ from sensors.hw103 import HW103Sensor
 from sensors.capacitive_moisture import CapacitiveMoistureSensor
 
 
-CONFIG = "configs/sensor_config_esp32_zero.json"
+CONFIG = "configs/sensor_config_esp32_inside.json"
 DEFAULT_MQTT_PORT = 1883
 DEFAULTT_TIME_INTERVAL = 60
 

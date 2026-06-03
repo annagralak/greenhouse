@@ -1,16 +1,17 @@
 {
-  "id": "esp32_zero-2",
-  "topic": "greenhouse/esp32_zero-2",
+  "id": "esp32_outside",
+  "topic": "greenhouse/esp32_outside",
   "mqtt_broker": "192.168.4.1",
   "mqtt_port": 1883,
   "loop_interval": 60,
 
   "sensors": [
     {
-      "id": "dht11_zero",
-      "type": "dht11",
+      "id": "bme280_outside",
+      "type": "bme280",
       "config": {
-        "pin": 4
+        "i2c_scl": 3,
+        "i2c_sda": 4
       }
     }
   ]

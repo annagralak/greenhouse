@@ -2,5 +2,5 @@ esp_setup/wifi_credentials.json
 TODO
 /venv/*
 __pycache__/*
-/data/*
+/rpi_setup/data/*
 /plots/*

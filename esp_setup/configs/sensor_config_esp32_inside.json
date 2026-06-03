@@ -1,20 +1,20 @@
 {
-  "id": "esp32-1",
-  "topic": "greenhouse/esp32-1",
+  "id": "esp32_inside",
+  "topic": "greenhouse/esp32_inside",
   "mqtt_broker": "192.168.4.1",
   "mqtt_port": 1883,
   "loop_interval": 60,
 
   "sensors": [
     {
-      "id": "dht11_1",
+      "id": "dht11_inside",
       "type": "dht11",
       "config": {
         "pin": 4
       }
     },
     {
-      "id": "bme280_1",
+      "id": "bme280_inside",
       "type": "bme280",
       "config": {
         "i2c_scl": 22,
@@ -22,7 +22,7 @@
       }
     },
     {
-      "id": "ds18b20_1",
+      "id": "ds18b20_inside",
       "type": "ds18b20",
       "config": {
         "pin": 15
