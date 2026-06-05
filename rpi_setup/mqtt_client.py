@@ -6,11 +6,10 @@ from utils import pretty_print
 class MQTTClient:
 	"""MQTT handler connecting messages to state, logging, and rules."""
 
-	def __init__(self, state_store, rule_engine, logger, config):
+	def __init__(self, state_store, logger, config):
 		"""Initialize MQTT client and callbacks."""
     
 		self.state = state_store
-		self.engine = rule_engine
 		self.logger = logger
 		self.config = config
 
@@ -37,12 +36,6 @@ class MQTTClient:
 		pretty_print(payload)
 		self.logger.log(msg.topic, payload)
 
-		changed_sensors = self.state.get_changed()
-
-		if changed_sensors:
-		    self.engine.evaluate(changed_sensors)
-		    self.state.clear_changed()
-
 	def connect(self):
 		"""Connect to MQTT broker."""
 	
@@ -55,4 +48,9 @@ class MQTTClient:
 	def loop(self):
 		"""Process MQTT events without blocking."""
 		self.client.loop(timeout=1.0)
+
+	def disconnect(self):
+	    """Disconnect cleanly from MQTT broker."""
+	    self.client.loop_stop()
+	    self.client.disconnect()
 

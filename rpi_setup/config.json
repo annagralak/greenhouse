@@ -2,38 +2,72 @@
   "mqtt_broker": "localhost",
   "mqtt_port": 1883,
   "topic_list": [
-    "greenhouse/esp32-1",
+    "greenhouse/esp32_inside",
     "greenhouse/esp32_outside"
   ],
 
-  "relays": [
+  "devices": [
     {
       "id": "heating_relay",
-      "type": "gpio",
+      "type": "relay",
       "config": {
         "pin": 17
       }
     },
     {
       "id": "lighting_relay",
-      "type": "gpio",
+      "type": "relay",
       "config": {
         "pin": 27
+      }
+    },
+    {
+      "id": "humidity_fan",
+      "type": "fan",
+      "config": {
+        "pin": 22
+      }
+    },
+    {
+      "id": "water_servo",
+      "type": "servo",
+      "config": {
+        "pin": 12,
+        "open": 90,
+        "closed": 0
       }
     }
   ],
   "rules": [
     {
       "type": "temperature_control",
-      "sensor": "bme280_1",
+      "sensor": "bme280_inside",
       "field": "temperature",
-      "relay": "heating_relay",
+      "device": "heating_relay",
       "on_below": 19,
       "off_above": 21
     },
     {
+      "type": "humidity_water_control",
+      "sensor": "bme280_inside",
+      "field": "humidity",
+      "device": "water_servo",
+      "on_below": 55,
+      "on_value": 90, 
+      "off_above": 65,
+      "off_value": 0
+    },
+    {
+      "type": "humidity_fan_control",
+      "sensor": "bme280_inside",
+      "field": "humidity",
+      "device": "humidity_fan",
+      "on_above": 70,
+      "off_below": 65
+    },
+    {
       "type": "time_control",
-      "relay": "lighting_relay",
+      "device": "lighting_relay",
       "on_hour": "6:00", 
       "off_hour": "18:00"    
     }
